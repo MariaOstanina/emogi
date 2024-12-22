@@ -1,0 +1,41 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint --fix src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "antd": "^5.22.5",
+    "eslint": "8.57.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@babel/core": "7.22.1",
+    "@babel/plugin-transform-runtime": "7.22.2",
+    "@babel/preset-env": "7.22.2",
+    "@babel/preset-react": "7.22.3",
+    "@babel/preset-typescript": "7.16.7",
+    "@babel/runtime": "7.22.3",
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "babel-eslint": "11.0.0-beta.2",
+    "eslint-config-prettier": "8.10.0",
+    "eslint-config-ts-react-important-stuff": "3.0.0",
+    "eslint-plugin-prettier": "5.0.0",
+    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-simple-import-sort": "12.1.1",
+    "globals": "^15.13.0",
+    "prettier": "3.0.2",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3"
+  }
+}
