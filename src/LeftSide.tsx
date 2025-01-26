@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { FormRadio } from './FormRadio';
+import { Timer } from './Timer';
 
 const Side = styled.div`
   width: 300px;
@@ -13,7 +14,8 @@ export const LeftSide = () => {
   return (
     <>
       <Side>
-        <FormRadio />
+        <FormRadio/>
+        <Timer />
       </Side>
     </>
   );

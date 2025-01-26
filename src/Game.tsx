@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { Button, Flex } from 'antd';
 import styled from 'styled-components';
-import { EMOJIES } from './constants';
+import { EMOJI_ARRAY } from './constants';
+import { cellsContext } from './FormRadio';
 import { mixRandom } from './utils';
 
 const Container = styled.div`
@@ -25,11 +26,22 @@ const Cell = styled.div`
 
 let timerId: null | number = null;
 
+export const timerContext = createContext(false);
+
 export const Game = () => {
-  const [emoji, setEmoji] = useState(mixRandom(EMOJIES));
+  const { setTimerIsStarted } = useContext(timerContext);
+  const { amountCells } = useContext(cellsContext); //количество выбранных ячеек
+  
+  const emojies = EMOJI_ARRAY.slice(0, amountCells / 2);
+  const emojiesArray = [...emojies, ...emojies];
+  const [emoji, setEmoji] = useState(mixRandom(emojiesArray));
   const [openedIndexes, setOpenedIndexes] = useState<number[]>([]); //массив с индексами открытых ячеек
   const [firstTempIndex, setFirstTempIndex] = useState<number | null>(null); // временная выбранная ячейка
   const [secondTempIndex, setSecondTempIndex] = useState<number | null>(null); // временная выбранная ячейка
+
+  useEffect(() => {
+    setEmoji(mixRandom(emojiesArray)); 
+  }, [amountCells]);
 
   const resetTimer = () => {
     clearTimeout(timerId!);
@@ -42,13 +54,14 @@ export const Game = () => {
   };
 
   const resetAll = () => {
-    setEmoji(mixRandom(EMOJIES));
+    setEmoji(mixRandom(emojiesArray));
     resetTimer();
     resetTemp();
     setOpenedIndexes([]);
   };
 
   const handleClick = (i: number) => {
+    setTimerIsStarted(true);
     if (
       openedIndexes.includes(i) ||
       [firstTempIndex, secondTempIndex].includes(i)
@@ -80,6 +93,10 @@ export const Game = () => {
       }
     }
   };
+
+  if (openedIndexes.length === emoji.length) {
+    setTimerIsStarted(false);
+  }
 
   return (
     <Container>
