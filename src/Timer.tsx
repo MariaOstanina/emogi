@@ -1,25 +1,62 @@
-import { useContext, useEffect, useState } from 'react';
-import { timerContext } from './Game';
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { useGlobalState } from './globalStateContext.tsx';
+
+const Time = styled.div`
+  margin-block-start: 20px;
+`;
+
+const formatTime = (time: number) => {
+  const hours = Math.floor(time / 3600)
+    .toString()
+    .padStart(2, '0');
+  const minutes = Math.floor((time / 60) % 60)
+    .toString()
+    .padStart(2, '0');
+  const sec = (time % 60).toString().padStart(2, '0');
+  return `${hours}:${minutes}:${sec}`;
+};
 
 export const Timer = () => {
-  const { timerIsStarted } = useContext(timerContext); //старт таймера
-  const [time, setTime] = useState<number>(0);
-
-  let hours: string = ('0' + Math.floor(time / 3600)).slice(-2);
-  let minutes: string = ('0' + Math.floor((time / 60) % 60)).slice(-2);
-  let sec: string = ('0' + Math.floor(time % 60)).slice(-2);
-  const [timesPlay, setTimesPlay] = useState<string>('00:00:00'); // таймер
+  const { isStarted, isClear, size, setIsStarted } = useGlobalState();
+  const [time, setTime] = useState(0);
+  const [dataTime, setDataTime] = useState<number[]>([]);
 
   useEffect(() => {
-    let interval: number | null = null;
-    if (timerIsStarted) {
-      interval = setInterval(() => {
-        setTime((time) => time + 1);
-        setTimesPlay(`${hours}:${minutes}:${sec}`);
-      }, 1000);
-    }
-    return () => clearInterval(interval!);
-  });
+    if (isClear) {
+      
+      if (time !== 0) {
+        setDataTime((p) => [...p, time]);
+        localStorage.setItem('dataTime', JSON.stringify(dataTime));
+        let res: string[] = [];
 
-  return <div>{timesPlay}</div>;
+        const results: string | null = localStorage.getItem('dataTime');
+
+        if (results) {
+          res = JSON.parse(results);
+        }
+        console.log(res);
+      }
+      setTime(0);
+      setIsStarted(false);
+    }
+  }, [isClear, size, dataTime]);
+
+  useEffect(() => {
+    let timeout: number | null = null;
+
+    if (isStarted) {
+      const tick = () => {
+        setTime((prev) => prev + 1);
+        timeout = setTimeout(tick, 1000);
+      };
+      timeout = setTimeout(tick, 1000);
+    }
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [isStarted]);
+
+  return <Time>{formatTime(time)}</Time>;
 };

@@ -18,5 +18,5 @@ export const EMOJI_ARRAY = [
   '👻',
   '🤯',
 ];
-//const EMOJI_ARRAY = ['🥶', '🙈', '😁', '😆', '😻', '🤣', '😂', '🙂'];
-//export const EMOJIES = [...EMOJI_ARRAY, ...EMOJI_ARRAY];
+
+export const SIZES = ['2', '4', '6'] as const;

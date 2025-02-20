@@ -1,14 +1,18 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { Button, Flex } from 'antd';
 import styled from 'styled-components';
 import { EMOJI_ARRAY } from './constants';
-import { cellsContext } from './FormRadio';
+import { useGlobalState } from './globalStateContext.tsx';
 import { mixRandom } from './utils';
 
-const Container = styled.div`
+interface ContainerProps {
+  $grid: string;
+}
+
+const Container = styled.div<ContainerProps>`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  grid-template-columns: ${(props) => `repeat(${props.$grid}, 1fr)`};
+  grid-template-rows: ${(props) => `repeat(${props.$grid}, 1fr)`};
   width: 600px;
   height: 600px;
   margin: 0 auto;
@@ -29,10 +33,9 @@ let timerId: null | number = null;
 export const timerContext = createContext(false);
 
 export const Game = () => {
-  const { setTimerIsStarted } = useContext(timerContext);
-  const { amountCells } = useContext(cellsContext); //количество выбранных ячеек
-  
-  const emojies = EMOJI_ARRAY.slice(0, amountCells / 2);
+  const { size, setIsStarted, isStarted, setIsClear, isClear } =
+    useGlobalState();
+  const emojies = EMOJI_ARRAY.slice(0, (+size) ** 2 / 2);
   const emojiesArray = [...emojies, ...emojies];
   const [emoji, setEmoji] = useState(mixRandom(emojiesArray));
   const [openedIndexes, setOpenedIndexes] = useState<number[]>([]); //массив с индексами открытых ячеек
@@ -40,8 +43,8 @@ export const Game = () => {
   const [secondTempIndex, setSecondTempIndex] = useState<number | null>(null); // временная выбранная ячейка
 
   useEffect(() => {
-    setEmoji(mixRandom(emojiesArray)); 
-  }, [amountCells]);
+    setEmoji(mixRandom(emojiesArray));
+  }, [size]);
 
   const resetTimer = () => {
     clearTimeout(timerId!);
@@ -58,10 +61,20 @@ export const Game = () => {
     resetTimer();
     resetTemp();
     setOpenedIndexes([]);
+    setIsClear(true);
   };
 
+  useEffect(() => {
+    if (isClear) {
+      resetAll();
+    }
+  }, [isClear, size]);
+
   const handleClick = (i: number) => {
-    setTimerIsStarted(true);
+    setIsClear(false);
+    if (!isStarted) {
+      setIsStarted(true);
+    }
     if (
       openedIndexes.includes(i) ||
       [firstTempIndex, secondTempIndex].includes(i)
@@ -94,23 +107,25 @@ export const Game = () => {
     }
   };
 
-  if (openedIndexes.length === emoji.length) {
-    setTimerIsStarted(false);
-  }
+  useEffect(() => {
+    if (openedIndexes.length === emoji.length) {
+      setIsStarted(false);
+    }
+  }, [openedIndexes.length, emoji.length]);
 
   return (
-    <Container>
+    <Container $grid={size}>
       {openedIndexes.length === emoji.length ? (
         <Flex vertical>
           <img
             src='https://otkritkis.com/wp-content/uploads/2022/07/htjd4.gif'
-            alt=''
+            alt='знак вопроса'
           />
           <Button onClick={resetAll}>Начать заново</Button>
         </Flex>
       ) : (
         emoji.map((el, i) => (
-          <Cell key={i} onClick={() => handleClick(i)}>
+          <Cell key={i} onClick={() => handleClick?.(i)}>
             {openedIndexes.includes(i) ||
             [firstTempIndex, secondTempIndex].includes(i)
               ? el
