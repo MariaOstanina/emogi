@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import { Game } from './Game.tsx';
-import { LeftSide } from './LeftSide.tsx';
+import { Game, LeftSide } from './components';
 
 const Wrapper = styled.div`
   display: flex;

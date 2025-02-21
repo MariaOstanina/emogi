@@ -1,7 +1,7 @@
 import { Radio, RadioGroupProps } from 'antd';
 import type { CheckboxGroupProps } from 'antd/es/checkbox/Group';
-import { SIZES } from './constants.ts';
-import { useGlobalState } from './globalStateContext.tsx';
+import { SIZES } from '../constants.ts';
+import { useGlobalState } from '../globalStateContext.tsx';
 
 const options: CheckboxGroupProps<string>['options'] = SIZES.map((el) => ({
   label: el,
@@ -9,11 +9,11 @@ const options: CheckboxGroupProps<string>['options'] = SIZES.map((el) => ({
 }));
 
 export const ChangeSize = () => {
-  const { setSize, size, setIsClear } = useGlobalState();
+  const { setSize, size, setIsInitial } = useGlobalState();
 
   const handleChange: RadioGroupProps['onChange'] = (e) => {
     setSize(e.target.value);
-    setIsClear(true);
+    setIsInitial(true);
   };
 
   return (

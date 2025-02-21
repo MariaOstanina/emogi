@@ -12,11 +12,15 @@ type TSizes = (typeof SIZES)[number];
 
 type TValue = {
   size: TSizes;
-  isClear: boolean;
+  isInitial: boolean;
   isStarted: boolean;
   setSize: (n: TSizes) => void;
   setIsStarted: (v: boolean) => void;
-  setIsClear: (v: boolean) => void;
+  setIsInitial: (v: boolean) => void;
+  reset: () => void;
+  addResult: () => void;
+  latestResults: number[];
+  setLastResult: (t: number) => void;
 };
 
 export const GlobalStateContext = createContext<TValue | null>(null);
@@ -24,7 +28,20 @@ export const GlobalStateContext = createContext<TValue | null>(null);
 export const GlobalStateProvider = ({ children }: PropsWithChildren) => {
   const [size, setSizeState] = useState<TSizes>('2');
   const [isStarted, setIsStartedState] = useState(false);
-  const [isClear, setIsClear] = useState(true);
+  const [isInitial, setIsInitial] = useState(true);
+  const [latestResults, setLatestResults] = useState(
+    JSON.parse(localStorage.getItem('time') || '[]'),
+  );
+  const [lastResult, setLastResult] = useState<number>(0);
+
+  const addResult = () => {
+    setLatestResults((p: string) => {
+      const newResults = [...p, lastResult];
+      localStorage.setItem('time', JSON.stringify(newResults));
+
+      return newResults;
+    });
+  };
 
   const setSize = useCallback((n: TSizes) => {
     setSizeState((prev) => (prev !== n ? n : prev)); // Обновляем, только если значение изменилось
@@ -34,16 +51,25 @@ export const GlobalStateProvider = ({ children }: PropsWithChildren) => {
     setIsStartedState((prev) => (prev !== v ? v : prev));
   }, []);
 
+  const reset = () => {
+    setIsStarted(false);
+    setIsInitial(true);
+  };
+
   const value = useMemo(
     () => ({
-      isClear,
+      isInitial,
       size,
       isStarted,
       setSize,
       setIsStarted,
-      setIsClear,
+      setIsInitial,
+      reset,
+      addResult,
+      latestResults,
+      setLastResult,
     }),
-    [size, isStarted, setSize, setIsStarted, isClear, setIsClear],
+    [size, isStarted, isInitial, latestResults, lastResult],
   );
 
   return (
